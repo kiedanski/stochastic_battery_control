@@ -6,6 +6,7 @@ PROJECTDIR = '/home/guso/Projects/summerschool/'
 DATADIR = PROJECTDIR + 'data/'
 TMPDIR = PROJECTDIR + 'tmpdir/'
 RUNDIR = PROJECTDIR + 'rundir/'
+IMGDIR = PROJECTDIR + 'essay/img/'
 
 
 PRICE_BUY_1 = np.ones(48) * 12.3
@@ -15,6 +16,19 @@ PRICE_SELL_1 = np.ones(48) * 10
 
 POWERWALL2 = {
     'ss'        : 1,
+    'T'         : 48,
+    'e_ch'      : 0.95,
+    'e_dis'     : 0.95,
+    'ramp_up'   : 2.5,
+    'ramp_down' : -2.5,
+    'b_max'     : 13.5,
+    'b_min'     : 0,
+    'pb'        : PRICE_BUY_1,
+    'ps'        : PRICE_SELL_1
+}
+
+POWERWALL2_SS14 = {
+    'ss'        : 14,
     'T'         : 48,
     'e_ch'      : 0.95,
     'e_dis'     : 0.95,

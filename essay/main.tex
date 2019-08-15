@@ -1,0 +1,283 @@
+\documentclass[11pt]{article}
+\usepackage{lipsum}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{optidef}
+\usepackage{graphicx}
+\linespread{1.5} 
+\theoremstyle{definition}
+\newtheorem{thm}{Theorem}
+\newtheorem{observation}[thm]{\textbf{Observation}}
+\author{Diego Kiedanski}
+\title{Two-stage stochastic MPC for battery arbitrage in residential household}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Home Energy Management Systems (HEMS) are currently one of the most prominent solutions for Demand Side Management (DSM), that is, controlling and shaping the energy demand of end-customers.
+
+The main idea behind such system is the underlying assumption that consumption requirements are flexible in some way. For example, a fridge does not require power constantly but in short bursts spaced in time, while a room can be cooled or heated in advance. 
+
+For residential households without smart appliances, energy storage can provided the desired flexibility by charging when the electricity price is low and discharging when required. The problem of optimally controlling energy storage has been widely studied in the literature.
+
+One of the most prominent of such problems is arbitrage. It consists on optimally controlling the battery when the price of electricity is uncertain and the objective is to minimize costs.
+
+Arbitrage in residential households is peculiar because the most traditional price structure faced by these type of customers is a Time-of-Use tariff that is known in advance. Therefore, forecasting future prices (the major problem in arbitrage) is not required anymore. The above prompted the following question: How sensitive is the optimal control of a battery when the uncertainty comes only from the load and not from the prices?
+
+In \cite{kiedanski}, the authors investigate this subject using only deterministic optimization approaches. Consequently, the goal of this essay is to extend the previous result for the case in which the optimization problem is stochastic. We seek to understand when there is an advantage in running stochastic optimization instead and what is the cost of it (in terms of additional computation).
+
+The work in this essay is similar to \cite{del2016impact} in that both deal compare the performance of the deterministic versus the stochastic model when the uncertainty comes from the \textit{load}. However, here we use MPC, which in general improves the performance of the deterministic problem and moreover, the price structure considered here is special (piece wise constant with three levels). The authors in \cite{smpc} compare the performance of stochastic versus deterministic MPC, but consider dynamic prices and their model of the load is unrealistic, one of the major difficulties encountered here.
+
+\section{Model definition}
+
+Following the model in \cite{kiedanski}, we model the control of the battery as a finite horizon optimization problem with discrete $\mathcal{T} = \{0, 1, \dots, T-1\}$ timeslots.
+The storage is modeled by the difference equation \eqref{eq:batbase}.
+\begin{equation}
+  \label{eq:batbase}
+  b_{t+1} = b_t + x_t,
+\end{equation}
+where $b_i$ is the State of Charge (SoC) of the battery at time i and $b_0$,
+the initial SoC, is given. In Equation \eqref{eq:batbase}, $x_t \in \mathcal{X}(b)$ denotes the
+energy charging (positive) or discharging (negative) the battery. The set
+$\mathcal{X}(b)$ of feasible actions depends on the SoC and is defined in
+Equation \eqref{eq:feasset} where $\delta_{max} > 0$ and $\delta_{min} < 0$ denote the
+maximum charging and discharging rate (in power), $h$ is the length of each time
+interval and $b_{max}$ and $b_{min}$ are the maximum and minimum SoC of the
+battery.
+\begin{equation}
+  \label{eq:feasset}
+  \mathcal{X}(b) = \left[\max\{\delta_{min}h, b_{min} - b \}, \min\{
+  \delta_{max}h, b_{max} - b\} \right]
+\end{equation}
+
+Because we consider efficiency losses, the actual energy required to charge the
+battery an amount $x_t$ is $\frac{x_t}{\eta_c}$ ($\eta_c \in (0, 1]$) while the energy
+seen from outside the battery when it discharges $x_t$ is $x_t\eta_d$ ($\eta_d \in
+(0, 1]$). In what follows, we will denote the energy seen from the outside of
+the battery $s_t$.
+
+Each time slot $t$, consumers are faced with a buying price $p^b_t$ and
+a selling price $p^s_t$. The inflexible load of the consumer at time $t$ is
+denoted $z_t$ (a positive value represents consumption while a negative value represents surplus of generation).
+
+The consumer is interested in solving the optimization problem \eqref{eq:optprob} with starting time $l=0$.
+\begin{mini!}[1]
+  {x_l, \dots, x_{T-1}}{f(x) = \sum_{i=l}^{T-1} p^b_i[s_i + z_i]^+ - p^s_i[s_i
+  + z_i]^-}{}{P_l)}
+  \label{eq:optprob}
+  \addConstraint{b_{j+1} }{= b_j + x_j }{ \ j=l, \ldots,T-1}
+  \addConstraint{x_j }{\in \mathcal{X}(b_j) }{j=l, \ldots,T-1}
+\end{mini!}
+
+where $[\cdot]^+ = \max\{\cdot, 0\}$ and $[\cdot]^- = \max\{-\cdot, 0\}$
+
+The optimization problem \eqref{eq:optprob} can be transformed into a linear program, and in what follows we will work with the linearized version of it to which we will refer simply as the LP.
+
+\subsection{MPC}
+
+We consider a receding horizon implementation of model predictive control. For each time step $t\in \mathcal{T}$ we will solve the optimization problem $P_t$. For its solution, we fix the first control of the battery, i.e, for $P_l$ it is $x_l$, and proceed to the next time slot. 
+
+
+\subsection{Stochastic MPC}
+
+To study the lost value in working with a deterministic version, we replaced the LP, with a two-stage stochastic linear program. Let $\mathcal{F} = \{0, \dots, F\}$ be the set of timeslots in the first stage and $\mathcal{S} = \{F+1, \dots, T-1 \}$ be the set of timeslots in the second stage. Theoptimization problem \eqref{eq:stoclp} is the two-stage analog of the problem \eqref{eq:optprob}.
+
+
+\begin{mini!}[4]
+	{x^c, x^d}{f(x) = 0x^c + 0x^d + Q(x^c, x^d)}{}{SLP}
+  \label{eq:stoclp}
+ \addConstraint{\sum_{t=0}^j x^c_t - x^d_t}{\in [b_{min} - b_0, b_{max} - b_0]}{\ \forall j \in \mathcal{F}}
+\addConstraint{x^c_j, x^d_j}{\geq 0}{\ \forall j \in \mathcal{F}}
+\end{mini!}
+
+
+where $$Q(x) = \sum_{\zeta \in Z} p^\zeta Q(x, z^\zeta)$$, $Z$ is the set of scenarios, $z^\zeta$ is a realization of the random vector $z$ and $Q(x, z^\zeta)$ is defined as the optimal value of the optimization problem \eqref{eq:secondstage}.
+
+\begin{mini!}[1]
+	{y^c, y^d, \alpha}{Q(x, z^\zeta) = \sum_{t \in \mathcal{T}} \alpha_t}{}{RECOURSE)}
+	\label{eq:secondstage}
+	\addConstraint{-\alpha_j}{\leq p^b_j\left[ \frac{x^c_j}{\eta_c} - \eta_d x^d_j + z^\zeta_j \right]}{\ \forall j \in \mathcal{F}}
+	\addConstraint{-\alpha_j}{\leq p^s_j\left[ \frac{x^c_j}{\eta_c} - \eta_d x^d_j + z^\zeta_j \right]}{\ \forall j \in \mathcal{F}}
+	\addConstraint{p^b_l\left[ \frac{y^c_l}{\eta_c} - \frac{y^d_l}{\eta_d} \right] -\alpha_l}{ \leq -p^b_l z^\zeta_l}{\ \forall l \in \mathcal{S}}
+	\addConstraint{p^s_l\left[ \frac{y^c_l}{\eta_c} - \frac{y^d_l}{\eta_d} \right] -\alpha_l}{ \leq -p^s_l z^\zeta_l}{\ \forall l \in \mathcal{S}}
+	\addConstraint{\sum_{t=0}^l y^c_l - y^d_t}{\in [b_{min} - B_{\mathcal{F}}, b_{max} - B_{\mathcal{F}}]}{\ \forall l \in \mathcal{S}}
+	\addConstraint{y^c_l, y^d_l}{\geq 0}{\ \forall l \in \mathcal{S}}
+\end{mini!}
+
+and $B_{\mathcal{F}} = b_0 + \sum_{t \in \mathcal{F}} (x^c_t - x^d_t)$
+
+\begin{observation}
+	In the first stage, without knowledge of the load, the actions to control the battery in the first $F$ periods are decided. After that, the real load is revealed and in the second stage, the remaining actions are chosen. 
+\end{observation}
+
+\begin{observation}
+The stochastic optimization problem has fixed recourse. To see this, observe that the coefficients of $z, x^c$ and $x^d$ are always constant.
+\end{observation}
+
+\begin{observation}
+	The problem has relatively complete recourse. Observe that for any feasible first stage decision, $y^c$ and $y^d$ can be chosen equal to 0, for which there exists an appropriate $\alpha$ (which is unbounded) that makes the whole second stage problem feasible.
+\end{observation}
+
+\section{Experiment Setup}
+
+In this section, a finer grained explanation of how the experiment was carried is provided. In particular, we explain how the scenarios were selected and the parameters used for the simulation.
+\subsection{Scenarios and forecasts}
+
+In our previous work, we compared different forecasting techniques and their impact on the overall profit of the arbitrage problem. Depending on the forecast technique, the number of data points from previous days required varied. For example, to produce a \textit{Persistance} forecast, only data from the previous day was required, while for the forecast using Gaussian noise, no previous data was needed.
+Because the goal of this essay is to compare the difference in performance of the deterministic versus the stochastic version, it would be desirable if both of them had access to the same information set. That is, the data used to generate the forecast is the same used as scenarios. 
+The two remaining forecasts (used in \cite{kiedanski}) satisfy the above requirement. However, since SARIMA performed badly, in the following experiments we will focus on \textit{AvgPast}.
+
+More formally, let $d$ be the day for which the problem needs to be solved and denote $z_d \in \mathbb{R}^{48}$ denote the real load in that day. Moreover denote $Z^k_d = \{ z_{d - 7}, \dots, z_{d - 7k}\}$ the set of scenarios corresponding to the $k$ previous days in the same day of the week (k previous Tuesdays if $d$ is a Tuesday, etc.).
+The \textit{AvgPast} forecast $\hat{z}^k_d$ using the $k$ previous days will be defined as the coordinate-wise mean of the vectors in $Z^k_d$. As for the scenarios used in the stochastic optimization problem, they will be all the elements of $Z^k_d$, where we assumed that they occur with the same probability $\frac{1}{k}$.
+
+\begin{observation}
+	One of the main assumptions while using MPC is that new information will arrive in future periods, and therefore postponing decisions will provide a benefit. Because in our problem the load (the only uncertainty) does not affect the control once known, another mechanism has to be put into place to exploit the advantages of MPC. A natural way to do so is to improve the forecast in each iteration. To model such an improvement we assume that in every iteration, the load in the first time slot is known (that is, the forecast is perfect for the first time slot). This is a reasonable assumption, as the problem of forecasting 30 minutes ahead is a not very hard.	
+\end{observation}
+
+\subsection{Data}
+All the experiments were ran with a finite time horizon of 1 day, and each timeslot of length 30 minutes, yielding 48 timeslots in total. The price was hold constant for all simulations with $p^s_t = 10c, \ \forall t$ and $$p^b_t = \begin{cases} 15.8 & \text{ if } 14\leq t \leq 45 \\ 12.3 & \text{ otherwise} \end{cases}$$
+The battery was modeled after Tesla's Powerwall2, with the parameters given by Table \ref{tab:powerwall}
+
+The load was obtained from the Ausgrid data project \cite{dataset} that contains the consumption of 300 consumers in Australia between 2012 and 2013. This dataset also includes solar production for same customers. 
+
+\begin{table}[htpb]
+  \centering
+  \caption{Powerwall parameters}
+  \label{tab:powerwall}
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    $\delta_{max}$ & $\delta_{min}$ & $b_{max}$  & $b_{min}$ & $\eta_c$
+                   & $\eta_d$ \\
+    \hline
+    5 & -5 & 13.5 & 0 & 0.95 & 0.95 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Regarding the length of the first stage, we considered two possible implementations. In the first one, $\mathcal{F} = \{0\}$ and only the first decision is used, while in the second one $\mathcal{F} = \{0, \dots, 13 \}$. The later is motivated in the price structure of the problem, given that is in those periods that the arbitrage should be performed (while the price is low). In what follows we will refer to the first version of the stochastic MPC as SMPC and the second one as SMPC14. The deterministic version will be named plainly MPC.
+
+To solve the stochastic program, we used PySP \cite{pysp} to generate the extend formulation of the problem and CPLEX for the resulting linear program.
+
+\section{Results}
+
+In this section, the simulation results are presented and their interpretation discussed. Results are shown for two particular settings, varying the number of scenarios while fixing the day predicted and evaluating consecutive days while keeping the number of scenarios fixed.
+
+\subsection{Varying the number of scenarios}
+
+First, we turn our attention to a setting with varying number of scenarios. For the four cases presented in Table \ref{tab:cases1}, we ran the experiments using the sets $Z^2_d, \dots Z^{13}_d$.
+
+\begin{table}[htpb]
+  \centering
+  \caption{Cases varying the number of scenarios}
+  \label{tab:cases1}
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    User & Day & Month & Year \\
+    \hline
+    1 & 2013 & 5 & 22 \\
+    \hline
+    300 & 2013 & 5 & 22 \\
+    \hline
+    7 & 2012 & 10 & 22 \\
+    \hline
+    7 & 2013 & 5 & 15 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Figure \ref{fig:objall} depicts the results of our simulations for the four cases described above. 
+For each quantity of scenarios and each case, the three versions of the MPC were ran. The curves plotted are the result of evaluating such solutions on the real data of the day. The solid horizontal lines represent the cost of running the optimization algorithm with perfect information and the cost of not having a battery (the worst case), respectively. 
+It can be seen that in general, performing Stochastic MPC provides a better performance than the deterministic analog, although there are scenarios in cases B and C where the performance of the deterministic MPC is better.
+As for SMPC and SMPC 14, their performance is very similar. There are scenarios for which each one of them is better than the other, but hardly enough evidence to draw conclusions.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=1\linewidth]{img/objall}
+	\caption{The cost (in cents of euro) of implementing the different MPCs algorithms during 4 different days with varying number of scenarios.}
+	\label{fig:objall}
+\end{figure}
+
+We can also use this dataset to evaluate the \textit{in-sample} stability of the two stochastic MPCs. To do so, we obtain the optimal value of the stochastic problem during the first iteration of the MPC. The results can be seen in Figure \ref{fig:insample}. 
+We would like to see that as the number of scenarios increases, the optimal value converges.
+Unfortunately, it is not the case, as it can be clearly see in Figure \ref{fig:insample}. An possible explanation is the following: the optimal cost for each day in the scenarios can vary drastically from one week to another. This is specially true as the scenarios grow further apart in time. This is unfortunate, as a lack of convergence makes the selection of the number of scenarios in $Z^k_d$ a much more difficult problem.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=1\linewidth]{img/insample}
+	\caption{The optimal value of the stochastic optimization problem in the first iteration of the MPC for different number of scenarios and cases.}
+	\label{fig:insample}
+\end{figure}
+
+\subsection{Considering more days}
+
+Having obtained a first insight in the previous subsection, we ran a bigger experiment. For this, we consider the same setup as before, and solve the control problem for users 7 and 300 for eight different days: from the 2nd May 2013 until the 10th May 2013. 
+For clarity of exposition, we select $k=10$ as the size of the scenario set, eventhough we know, from the previous subsection that this might not be representative of other choises of $k$. Nevertheless, if this had to be put into practice, a practical choice of $k$ had to be made, and consequently, it is not an unreasonable assumption.
+
+Tables \ref{tab:u7} and \ref{tab:u300} show the results for users 7 and 300 respectively. Each row represents a different day, while each column corresponds to each one of the curves present in Figure \ref{fig:objall}.
+Interestingly, we observe that for user 7, the stochastic implementations perform worse than the deterministic one, while for user 300 the opposite holds. For both users, SMPC 14 performs worse than SMPC.
+
+%For completeness, we ran the simulations using more data, in particular, we fixed the number of scenarios in 10, and we considered 8 days for two users: from the 2nd of May 2013 until the 10th. As it was previously mentioned, the decision of using 10 scenarios is rather arbitrary, as the in-sample stability does not seem to converge. Nevertheless, because  here the purpose is to explore if the results of the previous subsection (Stochastic MPC being better than its determinstic counterpart) still hold, we expect that a trend will be visible if the data is sufficiently large.
+%
+%Figure \ref{fig:severaldays} shows for 8 consecutive days the results of the different MPCs. As in the previous subsection, the stochastic MPC slightly outperforms the deterministic implementation. Interestingly, in the figure it is clear to appreciate the changes in the optimal cost for different days. 
+
+%\begin{figure}[htpb]
+%	\centering
+%%	\includegraphics[width=1\linewidth]{img/severaldays}
+%	\caption{Results of evaluating the 3 versions of MPC on 8 days for users 7 and 300.}
+%	\label{fig:severaldays}
+%\end{figure}
+\begin{table}
+\centering
+\begin{tabular}{lrrrrr}
+	\toprule
+	{} &  Perf Inf &  Do Nth &    MPC &   SMPC &  SMPC14 \\
+	\midrule
+	2 &     -1.00 &    7.02 &   2.90 &   3.60 &    3.73 \\
+	3 &     -8.25 &   -0.93 &  -4.69 &  -3.18 &   -3.53 \\
+	4 &     39.28 &   47.88 &  41.19 &  41.13 &   41.23 \\
+	5 &    -11.63 &   -4.77 &  -9.91 &  -9.52 &   -9.14 \\
+	6 &    -14.03 &   -6.62 & -12.05 & -10.73 &  -10.09 \\
+	7 &      9.91 &   17.36 &  14.70 &  11.78 &   13.13 \\
+	8 &     16.64 &   23.99 &  20.26 &  17.96 &   18.26 \\
+	9 &      8.48 &   21.58 &  11.04 &  11.93 &   11.86 \\
+	\bottomrule
+\end{tabular}
+\caption{Results for user 7}
+\label{tab:u7}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{lrrrrr}
+	\toprule
+	{} &  Perf Inf &  Do Nth &     MPC &    SMPC &  SMPC14 \\
+	\midrule
+	2 &    289.36 &  320.58 &  297.70 &  297.74 &  298.32 \\
+	3 &    219.36 &  245.93 &  237.91 &  230.54 &  227.16 \\
+	4 &    363.99 &  393.88 &  375.99 &  363.99 &  363.99 \\
+	5 &    368.84 &  402.30 &  386.30 &  368.84 &  368.84 \\
+	6 &    332.90 &  354.51 &  341.40 &  338.42 &  334.33 \\
+	7 &    231.25 &  255.78 &  239.45 &  235.25 &  235.68 \\
+	8 &    301.30 &  323.54 &  309.43 &  309.23 &  312.25 \\
+	9 &    301.22 &  336.92 &  305.92 &  305.14 &  307.82 \\
+	\bottomrule
+\end{tabular}
+\caption{Results for user 300}
+\label{tab:u300}
+\end{table}
+
+\section{Final remarks}
+
+In this essay we explored the benefits of implementing a stochastic model predictive control for the operation of a battery owned by a residential household. This results extend the work in \cite{kiedanski} where the sensitivity to forecast errors was explored for the deterministic case. 
+The stochastic version was implemented as a two-stage linear stochastic program and was solved using the extensive form with CPLEX. 
+Results show that the stochastic version can outperform the deterministic version but it is not guaranteed to do so. Further analysis is required to determine under which circumstances one implementation is better than the other one.
+
+\bibliography{ref} 
+\bibliographystyle{plainnat}
+
+\end{document}

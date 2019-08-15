@@ -1,3 +1,8 @@
 tmpdir/*
 rundir/*
 data/*
+essay/build/*
+essay/img/*
+
+*.pyc
+

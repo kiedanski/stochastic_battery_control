@@ -1,0 +1,76 @@
+User 1, 2012 - 10 - 22 - No true present
+Points: 5, True 28.82, MPC 37.28, SMPC 34.09
+Points: 6, True 28.82, MPC 37.45, SMPC 34.32
+Points: 7, True 28.82, MPC 33.13, SMPC 34.37
+Points: 8, True 28.82, MPC 33.28, SMPC 34.35
+Points: 9, True 28.82, MPC 33.95, SMPC 34.69
+Points: 10, True 28.82, MPC 33.97, SMPC 34.85
+Points: 11, True 28.82, MPC 34.00, SMPC 34.72
+Points: 12, True 28.82, MPC 37.01, SMPC 36.40
+Points: 13, True 28.82, MPC 38.46, SMPC 36.97
+Points: 14, True 28.82, MPC 34.34, SMPC 35.48
+Points: 15, True 28.82, MPC 34.40, SMPC 35.99
+Points: 16, True 28.82, MPC 34.38, SMPC 37.75
+Points: 17, True 28.82, MPC 34.39, SMPC 37.31
+Data range does not work
+Data range does not work
+User 1, 2012 - 10 - 22 - True present
+Points: 5, True 28.82, MPC 31.25, SMPC 30.24
+Points: 6, True 28.82, MPC 31.15, SMPC 31.45
+Points: 7, True 28.82, MPC 31.51, SMPC 29.79
+Points: 8, True 28.82, MPC 31.41, SMPC 31.45
+Points: 9, True 28.82, MPC 31.80, SMPC 30.24
+Points: 10, True 28.82, MPC 31.86, SMPC 30.40
+Points: 11, True 28.82, MPC 31.92, SMPC 30.38
+Points: 12, True 28.82, MPC 32.05, SMPC 30.78
+Points: 13, True 28.82, MPC 32.32, SMPC 31.26
+Points: 14, True 28.82, MPC 32.45, SMPC 31.67
+Points: 15, True 28.82, MPC 32.55, SMPC 32.08
+Points: 16, True 28.82, MPC 32.68, SMPC 32.99
+Points: 17, True 28.82, MPC 32.88, SMPC 33.55
+Data range does not work
+Data range does not work
+User 1, 2013 - 05 - 22 - No true present
+Points: 5, True 218.95, MPC 251.97, SMPC 248.60
+Points: 6, True 218.95, MPC 251.13, SMPC 247.11
+Points: 7, True 218.95, MPC 252.06, SMPC 248.07
+Points: 8, True 218.95, MPC 251.45, SMPC 246.45
+Points: 9, True 218.95, MPC 252.18, SMPC 245.70
+Points: 10, True 218.95, MPC 251.91, SMPC 244.19
+Points: 11, True 218.95, MPC 251.69, SMPC 244.31
+Points: 12, True 218.95, MPC 252.26, SMPC 244.64
+Points: 13, True 218.95, MPC 252.43, SMPC 244.87
+Points: 14, True 218.95, MPC 251.69, SMPC 244.38
+Points: 15, True 218.95, MPC 251.76, SMPC 244.57
+Points: 16, True 218.95, MPC 251.90, SMPC 244.77
+Points: 17, True 218.95, MPC 251.81, SMPC 244.65
+Points: 18, True 218.95, MPC 253.37, SMPC 243.21
+Points: 19, True 218.95, MPC 252.77, SMPC 243.22
+User 1, 2013 - 05 - 22 - True present
+Points: 5, True 218.95, MPC 239.72, SMPC 230.68
+Points: 6, True 218.95, MPC 239.94, SMPC 230.54
+Points: 7, True 218.95, MPC 240.40, SMPC 230.54
+Points: 8, True 218.95, MPC 239.08, SMPC 229.93
+Points: 9, True 218.95, MPC 240.20, SMPC 230.43
+Points: 10, True 218.95, MPC 240.19, SMPC 229.93
+Points: 11, True 218.95, MPC 240.62, SMPC 230.43
+Points: 12, True 218.95, MPC 240.75, SMPC 230.43
+Points: 13, True 218.95, MPC 240.94, SMPC 230.54
+Points: 14, True 218.95, MPC 241.49, SMPC 230.55
+Points: 15, True 218.95, MPC 241.59, SMPC 230.55
+Points: 16, True 218.95, MPC 241.68, SMPC 230.68
+Points: 17, True 218.95, MPC 241.70, SMPC 230.68
+Points: 18, True 218.95, MPC 241.70, SMPC 230.68
+Points: 19, True 218.95, MPC 241.55, SMPC 230.55
+User 300, 2012 - 10 - 22 - No true present
+Points: 5, True 219.30, MPC 244.57, SMPC 245.53
+Points: 6, True 219.30, MPC 242.84, SMPC 244.19
+Points: 7, True 219.30, MPC 242.66, SMPC 244.53
+Points: 8, True 219.30, MPC 245.36, SMPC 244.01
+Points: 9, True 219.30, MPC 245.68, SMPC 247.90
+Points: 10, True 219.30, MPC 244.94, SMPC 248.64
+Points: 11, True 219.30, MPC 245.65, SMPC 248.06
+Points: 12, True 219.30, MPC 245.67, SMPC 248.49
+Points: 13, True 219.30, MPC 245.89, SMPC 248.84
+Points: 14, True 219.30, MPC 246.28, SMPC 249.21
+Points: 15, True 219.30, MPC 246.69, SMPC 249.28
