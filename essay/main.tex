@@ -85,7 +85,7 @@ We consider a receding horizon implementation of model predictive control. For e
 
 \subsection{Stochastic MPC}
 
-To study the lost value in working with a deterministic version, we replaced the LP, with a two-stage stochastic linear program. Let $\mathcal{F} = \{0, \dots, F\}$ be the set of timeslots in the first stage and $\mathcal{S} = \{F+1, \dots, T-1 \}$ be the set of timeslots in the second stage. Theoptimization problem \eqref{eq:stoclp} is the two-stage analog of the problem \eqref{eq:optprob}.
+To study the lost value in working with a deterministic version, we replaced the LP, with a two-stage stochastic linear program. Let $\mathcal{F} = \{0, \dots, F\}$ be the set of timeslots in the first stage and $\mathcal{S} = \{F+1, \dots, T-1 \}$ be the set of timeslots in the second stage. The optimization problem \eqref{eq:stoclp} is the two-stage analog of the problem \eqref{eq:optprob}.
 
 
 \begin{mini!}[4]
@@ -96,7 +96,7 @@ To study the lost value in working with a deterministic version, we replaced the
 \end{mini!}
 
 
-where $$Q(x) = \sum_{\zeta \in Z} p^\zeta Q(x, z^\zeta)$$, $Z$ is the set of scenarios, $z^\zeta$ is a realization of the random vector $z$ and $Q(x, z^\zeta)$ is defined as the optimal value of the optimization problem \eqref{eq:secondstage}.
+Where $$Q(x) = \sum_{\zeta \in Z} p^\zeta Q(x, z^\zeta)$$, $Z$ is the set of scenarios, $z^\zeta$ is a realization of the random vector $z$ and $Q(x, z^\zeta)$ is defined as the optimal value of the optimization problem \eqref{eq:secondstage}.
 
 \begin{mini!}[1]
 	{y^c, y^d, \alpha}{Q(x, z^\zeta) = \sum_{t \in \mathcal{T}} \alpha_t}{}{RECOURSE)}
@@ -216,7 +216,7 @@ Unfortunately, it is not the case, as it can be clearly see in Figure \ref{fig:i
 \subsection{Considering more days}
 
 Having obtained a first insight in the previous subsection, we ran a bigger experiment. For this, we consider the same setup as before, and solve the control problem for users 7 and 300 for eight different days: from the 2nd May 2013 until the 10th May 2013. 
-For clarity of exposition, we select $k=10$ as the size of the scenario set, eventhough we know, from the previous subsection that this might not be representative of other choises of $k$. Nevertheless, if this had to be put into practice, a practical choice of $k$ had to be made, and consequently, it is not an unreasonable assumption.
+For clarity of exposition, we select $k=10$ as the size of the scenario set, even though we know, from the previous subsection that this might not be representative of other choices of $k$. Nevertheless, if this had to be put into practice, a practical choice of $k$ had to be made, and consequently, it is not an unreasonable assumption.
 
 Tables \ref{tab:u7} and \ref{tab:u300} show the results for users 7 and 300 respectively. Each row represents a different day, while each column corresponds to each one of the curves present in Figure \ref{fig:objall}.
 Interestingly, we observe that for user 7, the stochastic implementations perform worse than the deterministic one, while for user 300 the opposite holds. For both users, SMPC 14 performs worse than SMPC.
